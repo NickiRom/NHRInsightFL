@@ -49,7 +49,7 @@ def setlist(beats_playlist):
 #--------------------------------------------------------------------
 def beatspl2tracks(beats_playlist):
     
-    access_token = '?access_token=hr9fk9dftzuzmpnsutqmq95a'
+    access_token = '?access_token=r2rxbdvur6eaq3q8dmscskqm'
     client_id = '&client_id=cu4dweftqe5nt2wcpukcvgqu'
     
     url = 'https://partner.api.beatsmusic.com/v1/api/playlists/' + beats_playlist + access_token
@@ -202,7 +202,7 @@ def EN_id2summary(filename, EN_id_list):
     fig, ax = ppl.subplots(1)
 
     ppl.pcolormesh(fig, ax, transformed)
-    fig.savefig(str(filename))
+    fig.savefig('app/static/'+str(filename))
     
     return songdatalist, dist_matrix, playlist
 
@@ -226,10 +226,10 @@ def DiGraph(songdatalist, dist_matrix, playlist):
     #put distance matrix into list of lists [[track1, track2, weight],...] for depth first search
     for index1, rows in enumerate(df):
         for index, cols in enumerate(df):
-            mytups = [df.index[index1], df.columns[index], df.ix[index1][index]]
+            mytups = [df.index[index1].encode('ascii', 'ignore'), df.columns[index].encode('ascii', 'ignore'), df.ix[index1][index]]
             tups.append(mytups)
     #transform weights to create a higher penalty for higher weights
-
+    orig_tups = tups
     scores = []
     
     for item in tups:
@@ -257,6 +257,9 @@ def DiGraph(songdatalist, dist_matrix, playlist):
                 maxtup = tup[2]
 
     shufflerange = maxtup - mintup
+
+    shuffle = random.sample(shuffleweight, len(playlist))
+
     # get an idea of the distribution of transition scores
     
     '''show histogram of 
@@ -268,8 +271,6 @@ def DiGraph(songdatalist, dist_matrix, playlist):
     for worst in scores:
         for tup in tups:
             if tup[2] >= average_score:
-                tups.remove(tup)
-            if tup[2] == 1:
                 tups.remove(tup)
                 
     tups_weights = []  #get weights of all kept tups for shuffle validation
@@ -290,8 +291,8 @@ def DiGraph(songdatalist, dist_matrix, playlist):
         weightlist = []
         for song in order:
             for tup in tups:
-                if tup[0]==str(song[0]):
-                    if tup[1]==str(song[1]):
+                if tup[0]==song[0]:
+                    if tup[1]==song[1]:
                         weightlist.append(tup[2])  #get the weight of the edges
     
         weightlistlist.append(weightlist)
@@ -301,86 +302,23 @@ def DiGraph(songdatalist, dist_matrix, playlist):
  
     #min(enumerate(a), key=itemgetter(1))[0]
     minval, idxmin = min((val, idx) for (idx,val) in enumerate(avg_edges))
-    print str(minval) + "is at " + str(idxmin)
-    
-    print orderlist[idxmin]
+
     bestlist = orderlist[idxmin]
+    bestpath = []
+    for songs in bestlist:
+        bestpath.append(songs[0])
     
                 
-    avgshuffleweight= sum(shuffleweight)/len(shuffleweight)
+    avg_shuffle= sum(shuffleweight)/len(shuffleweight)
 
 
     
-    improvement = (avgshuffleweight - .5618343)/shufflerange
+    improvement = int((avg_shuffle - minval)/avg_shuffle*100)
+    minval = round(minval, 2)
+    avg_shuffle = round(avg_shuffle, 2)
     
-    return weightlistlist, orderlist, avg_edges, bestlist, tups_weights, shufflerange, shuffleweight
-'''    #build a Directed graph
-    DG=nx.DiGraph()
-    DG.add_weighted_edges_from(tups)
-    #print DG.neighbors('a')
-    
-    #iterate over all starting songs
-    Tlist = []
-    orderlist = []
-    for node in DG:
-
-        T = nx.dfs_tree(DG,node)
-        #print nx.dfs_postorder_nodes(T)
-        order = list(v for u,v,d in nx.dfs_labeled_edges(DG,source=node)
-          if d['dir']=='reverse')
-        orderlist.append(order)
-    print orderlist[0]
-        
-    #print(list(nx.dfs_labeled_edges(T,node)))
-    Tlist.append(T)
-    #print(list(T.edges()))
-    #print Tlist
-    
-    
-    UTlist = []
-    for trees in Tlist:
-        UT=T.to_undirected()
-        #print(nx.connected_components(UT))
-        UTlist.append(nx.connected_components(UT))'''
+    return bestpath, minval, shuffle, avg_shuffle, improvement, orig_tups
 
 
-#---------------------------------------------------------------------------------
-
-# <codecell>
-
-plid = 'pl152858163299746048'
-track_id = beatspl2tracks(plid)
-
-EN_id_list = beats2echonest(track_id)
-
-filename = 'neverresethead'
-
-songdatalist, dist_matrix, playlist= EN_id2summary(filename, EN_id_list)
-
-weightlistlist, orderlist, avg_edges, bestlist, tups_weights, shufflerange, shuffleweight= DiGraph(songdatalist, dist_matrix, playlist)
-
-
-# <codecell>
-
-#print len(bestlist)
-#print tups_weights
-k = len(bestlist)
-shuffle = random.sample(shuffleweight, k+1)
-print shuffle
-avg_shuffle = sum(shuffle)/len(shuffle)
-print avg_shuffle
-print shufflerange
-improvement = (avg_shuffle - .58097)/avg_shuffle
-print improvement
-
-# <codecell>
-
-print weightlistlist[11]
-
-# <codecell>
-
-print shuffle
-
-# <codecell>
 
 
