@@ -1,4 +1,4 @@
-from flask import render_template, request, session
+from flask import Flask, render_template, request, session, url_for
 from app import app, host, port, user, passwd, db
 from app.helpers.database import con_db
 import pymysql
@@ -14,27 +14,26 @@ myvariables =[]
 @app.route('/index')
 def index():
     # Renders index.html.
-    session['counter']=-1
 
     return render_template('index.html')
 
+app.secret_key = 'junk'
+
 @app.route('/getplaylistinfo', methods=['POST'])
 def getplaylistinfo():
-    if session['counter']==-1:
-        request.form['query']   
-        query = request.form['query'] 
-        
-        beatstracks = beatspl2tracks(query)
-        entracks = beats2echonest(beatstracks)
-        summarydf, distance_matrix = EN_id2summary(entracks)
-        playlist = []
-        playlist = summarydf['song'].tolist()
-        UTlist, orderlist = DiGraph(distance_matrix, playlist)
+    
+    session['cookie'] =
+    request.form['query']   
+    query = request.form['query'] 
+    
+    beatstracks = beatspl2tracks(query)
+    entracks = beats2echonest(beatstracks)
+    summarydf, distance_matrix = EN_id2summary(entracks)
+    playlist = []
+    playlist = summarydf['song'].tolist()
+    UTlist, orderlist = DiGraph(distance_matrix, playlist)
 
-
-        
-        myvariables.append(orderlist)
-    session['counter']+=1
+    session['cookie'] = 
 
     return render_template('getplaylistinfo.html',  query=query, playlist=playlist, myvariables=myvariables)
 

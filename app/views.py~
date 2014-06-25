@@ -14,10 +14,10 @@ myvariables =[]
 @app.route('/index')
 def index():
     # Renders index.html.
-    session['counter']=-1
+    session['cookies'] = 
 
     return render_template('index.html')
-
+app.secret_key = 'junk'
 @app.route('/getplaylistinfo', methods=['POST'])
 def getplaylistinfo():
     if session['counter']==-1:

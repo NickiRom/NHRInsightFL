@@ -16,6 +16,8 @@ from pandas import *
 import numpy as np
 from numpy import *
 import urllib
+import scipy
+from scipy import *
 from scipy.spatial.distance import pdist, wminkowski, squareform
 import matplotlib.pyplot as plt
 import prettyplotlib as ppl
@@ -31,11 +33,11 @@ def setlist(beats_playlist):
     EN_id_list = beats2echonest(track_id)
     #print EN_id_list
     
-    dist_matrix = EN_id2summary(EN_id_list)
+    dist_matrix, playlist= EN_id2summary(EN_id_list)
     #print summarydf
     
     
-    UTlist = DiGraph(dist_matrix)
+    UTlist = DiGraph(dist_matrix, playlist)
     
     return UTlist
     
@@ -46,12 +48,13 @@ def setlist(beats_playlist):
 #--------------------------------------------------------------------
 def beatspl2tracks(beats_playlist):
     
-    access_token = '?access_token=k3tyz5f8cvjgyye7t4yc6xzk'
+    access_token = '?access_token=hr9fk9dftzuzmpnsutqmq95a'
     client_id = '&client_id=cu4dweftqe5nt2wcpukcvgqu'
     
     url = 'https://partner.api.beatsmusic.com/v1/api/playlists/' + beats_playlist + access_token
     response = requests.get(url)
     json_obj = json.loads(response.text)
+    pprint(json_obj)
     datum = json_obj['data']['refs']['tracks']
     
     track_id = []
@@ -190,17 +193,17 @@ def EN_id2summary(EN_id_list):
     for index in range(0, len(dist_matrix)):
         distancelist.append(dist_matrix[index])
     
-    return dist_matrix
+    return summarydf, dist_matrix
 
 
 #------------------------------------------------------------------------------
 
-def DiGraph(dist_matrix):
+def DiGraph(dist_matrix, playlist):
     
 
     #convert to dataframe with trackIDs as columns
     columns = ['a','b','c','d','e','f','g','h','i','k','j','l','m','n','o','p','q','r']
-    df = pd.DataFrame(dist_matrix, index = columns, columns = columns )
+    df = pd.DataFrame(dist_matrix, index = columns, columns = playlist)
     
     index = 0
     row = 2
@@ -249,13 +252,20 @@ def DiGraph(dist_matrix):
     
     #iterate over all starting songs
     Tlist = []
+    orderlist = []
     for node in DG:
 
         T = nx.dfs_tree(DG,node)
-        print list(nx.dfs_postorder_nodes(T))
-        print(list(nx.dfs_labeled_edges(T,node)))
-        Tlist.append(T)
-    print(list(T.edges()))
+        #print nx.dfs_postorder_nodes(T)
+        order = list(v for u,v,d in nx.dfs_labeled_edges(DG,source=node)
+          if d['dir']=='reverse')
+        orderlist.append(order)
+    print orderlist[0]
+        
+    #print(list(nx.dfs_labeled_edges(T,node)))
+    Tlist.append(T)
+    #print(list(T.edges()))
+    #print Tlist
     
     
     UTlist = []
@@ -264,11 +274,9 @@ def DiGraph(dist_matrix):
         #print(nx.connected_components(UT))
         UTlist.append(nx.connected_components(UT))
 
-    return UTlist
-
+    return UTlist, orderlist
 #---------------------------------------------------------------------------------
-t = setlist('pl147773287731036416')
-print t
+
 
 # <codecell>
 
