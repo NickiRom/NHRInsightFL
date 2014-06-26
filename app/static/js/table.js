@@ -4,24 +4,25 @@ var margin = { top: 50, right: 0, bottom: 100, left: 50 },
     height = 700 - margin.top - margin.bottom,
     gridSize = Math.floor(width / 20),
     legendElementWidth = gridSize*2,
-    buckets = len(playlist),
+    buckets = 9,
     colors =["#c82100","#c44100","#bf6000","#bb7d00","b79800","#b3b300","91ae00","#71aa00","#36a100","#009900"],
+    days = ['a','b','c','d','e','f','g','h','i','k','j','l','m','n','o','p','q','r']
+    times = ['a','b','c','d','e','f','g','h','i','k','j','l','m','n','o','p','q','r']
 
 
-
-pre = playlist, //$
-post = playlist; //months
+//pre = playlist, //$
+//post = playlist; //months
 
 d3.tsv("/static/data.tsv", function(d) {
   return {
-    day: +d.pre,
-    hour: +d.post,
-    value: +d.weight
+    day: +d.day,
+    hour: +d.hour,
+    value: +d.value
   };},
   function(error, data) {
     var colorScale = d3.scale.threshold()
-      .domain([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9 ])
-      .range([0].concat(colors));
+      .domain([0, buckets - 1, d3.max(data, function (d) { return d.value; })])
+      .range(colors);
 
     var svg = d3.select("#chart").append("svg")
       .attr("width", width + margin.left + margin.right)

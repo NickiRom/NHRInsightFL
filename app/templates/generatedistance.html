@@ -32,69 +32,13 @@
             <div class="item">
                 <div class='content'>
                     <h3 style="font-family:helvetica; font-size:20px;"> The transition score is {{minval}}! This playlist has {{improvement}}% better transitions than the shuffled version ({{minval}} compared to {{avg_shuffle}}).</h3>
-                    <img src="{{url}}" height="300px" width="400px" style="margin-left:auto; margin-right:auto">
+                    <img src="{{url}}" height="450px" width="600px" style="margin-left:auto; margin-right:auto">
                 </div>
             </div>
         </div>
   </div>
 </div>
 
-<div class="container w">
-
-
-            <h2>Tailor Loan for Funding Success </h2>
-            <b> Select loan amount and repayment term to maximise funding success for: <font color="red">LOANINFO with Kiva Loan ID LOANID </font> </b>
-
-            <br><br>
-        
-        <style>
-            rect.bordered {
-                stroke: #E6E6E6;
-                stroke-width:2px;
-                cursor:pointer;
-        }
-        
-        rect.bordered:hover {
-            stroke: #c82100;
-            stroke-width:6px;
-            cursor:pointer;
-        }
-        
-        rect.bordered.target {
-            stroke: #000000;
-            stroke-width:6px;
-        }
-        
-        text.mono {
-            font-size: 9pt;
-            font-family: Consolas, courier;
-            fill: #aaa;
-        }
-        
-        text.axis-workweek {
-            fill: #000;
-        }
-        
-        text.axis-worktime {
-            fill: #000;
-        }
-        </style>
-        <script  src="http://d3js.org/d3.v3.js"></script>
-        <div id="chart">
-        
-        </div>
-        
-        <script type="text/javascript">
-            month_pred_str = {{playlist}}
-            amount_pred_str = {{playlist}}
-            DiGraphtups = {{tups}}
-            roundedReqAmt={{playlist}}
-            requested_repayment_term = "RequestedPaymentTerm"
-            gridAmtSet = "gridAmtSet"
-            binreqLoanAmount="binreqLoanAmount"
-        </script>
-        <script src="/static/js/table.js"></script>
-</div>
 
 
 {% endblock %}
